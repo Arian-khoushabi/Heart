@@ -6,3 +6,6 @@ scikit-learn
 pandas
 numpy
 joblib
+lightgbm
+seaborn
+matplotlib
