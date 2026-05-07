@@ -18,43 +18,19 @@ env/
 venv/
 .venv/
 ENV/
+*.env
 
 # ----------------------------
-# Machine Learning assets
+# Machine Learning common ignores
 # ----------------------------
-# Ignore trained models
-*.pkl
-*.joblib
-*.h5
-*.hdf5
-models/
+# (Keep models/dataset unless you explicitly want them ignored)
+# If you create a /models folder later, uncomment:
+# models/
 
-# Ignore dataset files (optional—remove if you want dataset in GitHub)
-*.csv
-*.xlsx
-data/
-dataset/
+# If you store large datasets elsewhere, uncomment:
+# data/
+# dataset/
 
 # ----------------------------
-# Logs and artifacts
-# ----------------------------
-logs/
-*.log
-mlruns/
-wandb/
-tensorboard/
-tb_logs/
-
-# ----------------------------
-# System / Editor files
-# ----------------------------
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# ----------------------------
-# Environment variables
-# ----------------------------
-.env
-.env.*
+# Logs and run artifacts
+#
