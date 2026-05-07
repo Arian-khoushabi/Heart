@@ -1,0 +1,60 @@
+# ----------------------------
+# Python cache / compiled files
+# ----------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ----------------------------
+# Jupyter notebook checkpoints
+# ----------------------------
+.ipynb_checkpoints/
+
+# ----------------------------
+# Virtual environments
+# ----------------------------
+env/
+venv/
+.venv/
+ENV/
+
+# ----------------------------
+# Machine Learning assets
+# ----------------------------
+# Ignore trained models
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+models/
+
+# Ignore dataset files (optional—remove if you want dataset in GitHub)
+*.csv
+*.xlsx
+data/
+dataset/
+
+# ----------------------------
+# Logs and artifacts
+# ----------------------------
+logs/
+*.log
+mlruns/
+wandb/
+tensorboard/
+tb_logs/
+
+# ----------------------------
+# System / Editor files
+# ----------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ----------------------------
+# Environment variables
+# ----------------------------
+.env
+.env.*
