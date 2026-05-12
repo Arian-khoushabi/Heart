@@ -1,36 +1,45 @@
-# ----------------------------
-# Python cache / compiled files
-# ----------------------------
+# ------------------------
+# Python
+# ------------------------
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.pdb
 
-# ----------------------------
-# Jupyter notebook checkpoints
-# ----------------------------
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+*.env
+key.env
+
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
-# ----------------------------
-# Virtual environments
-# ----------------------------
-env/
-venv/
-.venv/
-ENV/
-*.env
+# VSCode
+.vscode/
 
-# ----------------------------
-# Machine Learning common ignores
-# ----------------------------
-# (Keep models/dataset unless you explicitly want them ignored)
-# If you create a /models folder later, uncomment:
-# models/
+# macOS
+.DS_Store
 
-# If you store large datasets elsewhere, uncomment:
+# Logs
+*.log
+
+# Model weights (optional)
+*.h5
+*.pt
+*.ckpt
+*.onnx
+
+# ------------------------
+# DO NOT IGNORE DATASETS
+# (so CSV files and folder are visible)
+# ------------------------
+
+# If your dataset is in /data, DO NOT put:
 # data/
-# dataset/
-
-# ----------------------------
-# Logs and run artifacts
-#
+# *.csv
