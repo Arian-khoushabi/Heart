@@ -31,7 +31,7 @@ except Exception as e:
 # ---------------------------------------
 # GapGPT Credentials
 # ---------------------------------------
-GAPGPT_API_KEY = "sk-uE1NwqeXapyKJNOEUqyyumoxSekgMl3iokmHiUcdp2SR9mUy"
+GAPGPT_API_KEY = "sk-WNpAqk13oTEMU0nfM8ojPwwMSgn9FdnFBb2BHBe6nIVPNhzW"
 GAPGPT_URL = "https://api.gapgpt.app/v1/chat/completions"
 
 

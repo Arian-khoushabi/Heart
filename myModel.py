@@ -56,10 +56,10 @@ if __name__ == "__main__":
         ("custom", custom_transformer),
         ("preprocess", column_transfomer),
         ("model", XGBClassifier(
-            n_estimators=2000,
+            n_estimators=1000,
             learning_rate=0.03,
-            max_depth=12,
-            min_child_weight=5,
+            max_depth=6,
+            min_child_weight=8,
             subsample=1.0,
             colsample_bytree=1.0,
             random_state=42,
@@ -83,15 +83,9 @@ if __name__ == "__main__":
         best_idx = np.argmax(f2_scores)
         best_threshold = thresholds[best_idx]
         y_predicts = (y_proba >= best_threshold).astype(int)
-        print(f"The best threshold is : {best_threshold}")
-        print(f"f2_score is : {f2_scores[best_idx]}")
         return y_predicts, best_threshold
 
     y_predicts, best_threshold = best_predict(pipeline, X_test, y_test)
-    print(f"f1_score is : {f1_score(y_test, y_predicts)}")
-    print(f"accuracy_score is : {accuracy_score(y_test, y_predicts)}")
-    print(f"precision_score is : {precision_score(y_test, y_predicts)}")
-    print(f"recall_score is : {recall_score(y_test, y_predicts)}")
 
     # 9.Deploy the model........
     final_model = HeartModel(
@@ -101,3 +95,4 @@ if __name__ == "__main__":
         cat_columns=cat_col
     )
     joblib.dump(final_model, "Heart_ai.pkl")
+    print("model saved successfully")
