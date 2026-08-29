@@ -7,39 +7,25 @@ __pycache__/
 *.pyd
 *.pdb
 
-# Virtual environments
 venv/
 env/
 .venv/
 
-# Environment variables
 .env
 *.env
 key.env
 
-# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
-# VSCode
 .vscode/
 
-# macOS
 .DS_Store
 
-# Logs
 *.log
 
-# Model weights (optional)
 *.h5
 *.pt
 *.ckpt
 *.onnx
 
-# ------------------------
-# DO NOT IGNORE DATASETS
-# (so CSV files and folder are visible)
-# ------------------------
-
-# If your dataset is in /data, DO NOT put:
-# data/
-# *.csv
+*.pkl
