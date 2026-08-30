@@ -6,7 +6,8 @@ from sklearn.preprocessing import OneHotEncoder, PowerTransformer
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, precision_recall_curve
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import precision_recall_curve, roc_auc_score, average_precision_score
 from sklearn.compose import ColumnTransformer
 import joblib
 from model_preprocess import HeartModel, CustomTransformer
@@ -22,11 +23,7 @@ if __name__ == "__main__":
     cat_col.remove("HeartDisease")
     num_col = data.select_dtypes(exclude="category").columns.to_list()
 
-    # 3.Handling Null values........
-    data.loc[data["Cholesterol"] == 0, "Cholesterol"] = data.loc[data["Cholesterol"] != 0, "Cholesterol"].median()
-    data.loc[data["RestingBP"] == 0, "RestingBP"] = data.loc[data["RestingBP"] != 0, "RestingBP"].median()
-
-    # 4.Spliting data........
+    # 3.Spliting data........
     X = data.drop("HeartDisease", axis=1)
     y = data["HeartDisease"]
 
@@ -35,13 +32,67 @@ if __name__ == "__main__":
         y,
         test_size=0.20,
         stratify=y,
+
         random_state=42
     )
+    X_fit, X_val, y_fit, y_val = train_test_split(
+    X_train,
+    y_train,
+    test_size=0.20,
+    stratify=y_train,
+    random_state=42
+    )
+
+
+    # 4.Handling Null values........
+    X_fit = X_fit.copy()
+    X_val = X_val.copy()
+    X_test = X_test.copy()
+
+    cholesterol_median = X_fit.loc[
+        X_fit["Cholesterol"] != 0,
+        "Cholesterol"
+    ].median()
+
+    restingbp_median = X_fit.loc[
+        X_fit["RestingBP"] != 0,
+        "RestingBP"
+    ].median()
+
+    X_fit.loc[
+        X_fit["Cholesterol"] == 0,
+        "Cholesterol"
+    ] = cholesterol_median
+
+    X_val.loc[
+        X_val["Cholesterol"] == 0,
+        "Cholesterol"
+    ] = cholesterol_median
+
+    X_test.loc[
+        X_test["Cholesterol"] == 0,
+        "Cholesterol"
+    ] = cholesterol_median
+
+    X_fit.loc[
+        X_fit["RestingBP"] == 0,
+        "RestingBP"
+    ] = restingbp_median
+
+    X_val.loc[
+        X_val["RestingBP"] == 0,
+        "RestingBP"
+    ] = restingbp_median
+
+    X_test.loc[
+        X_test["RestingBP"] == 0,
+        "RestingBP"
+    ] = restingbp_median
 
     # 5.Using transformers........
     pt = PowerTransformer(method="yeo-johnson", standardize=False)
-    pt.fit(X_train[["Oldpeak"]])
-    transformed = pt.transform(X_train[["Oldpeak"]])
+    pt.fit(X_fit[["Oldpeak"]])
+    transformed = pt.transform(X_fit[["Oldpeak"]])
     down_clip = np.quantile(transformed, 0.01)
     up_clip = np.quantile(transformed, 0.99)
     custom_transformer = CustomTransformer(pt, down_clip, up_clip)
@@ -70,22 +121,108 @@ if __name__ == "__main__":
             eval_metric="logloss"
         ))
     ])
-    pipeline.fit(X_train, y_train)
+    pipeline.fit(X_fit, y_fit)
 
     # 8.Test scores........
-    def best_predict(model, X_test, y_test):
-        y_proba = model.predict_proba(X_test)[:, 1]
-        precisions, recalls, thresholds = precision_recall_curve(y_test, y_proba)
-        beta = 2
-        precision_adj = precisions[:-1]
-        recall_adj = recalls[:-1]
-        f2_scores = (1 + beta**2) * (precision_adj * recall_adj) / ((beta**2 * precision_adj) + recall_adj)
-        best_idx = np.argmax(f2_scores)
-        best_threshold = thresholds[best_idx]
-        y_predicts = (y_proba >= best_threshold).astype(int)
-        return y_predicts, best_threshold
+    def find_best_threshold(model, X_val, y_val, min_recall=0.90):
 
-    y_predicts, best_threshold = best_predict(pipeline, X_test, y_test)
+        y_proba = model.predict_proba(X_val)[:, 1]
+
+        best_threshold = None
+        best_specificity = -1
+        best_recall = 0
+        best_precision = 0
+
+        for threshold in np.linspace(0.01, 0.99, 990):
+
+            y_pred = (
+                y_proba >= threshold
+            ).astype(int)
+
+            tn, fp, fn, tp = confusion_matrix(
+                y_val,
+                y_pred
+            ).ravel()
+
+            recall = tp / (tp + fn)
+
+            specificity = tn / (tn + fp)
+
+            precision = (
+                tp / (tp + fp)
+                if (tp + fp) > 0
+                else 0
+            )
+
+            if recall >= min_recall:
+
+                if specificity > best_specificity:
+
+                    best_threshold = threshold
+                    best_specificity = specificity
+                    best_recall = recall
+                    best_precision = precision
+
+        print(f"Minimum required recall: {min_recall:.4f}")
+        print(f"Selected threshold: {best_threshold:.4f}")
+        print(f"Validation recall: {best_recall:.4f}")
+        print(f"Validation specificity: {best_specificity:.4f}")
+        print(f"Validation precision: {best_precision:.4f}")
+
+        return best_threshold
+    
+    best_threshold = find_best_threshold(
+    pipeline,
+    X_val,
+    y_val,
+    min_recall=0.85
+)
+
+    pipeline.fit(X_train, y_train)
+    y_proba_test = pipeline.predict_proba(X_test)[:, 1]
+
+    y_pred_test = (
+        y_proba_test >= best_threshold
+    ).astype(int)
+
+    print(
+    f"accuracy is "
+    f"{accuracy_score(y_test, y_pred_test):.4f}"
+    )
+    print(
+        f"precision is "
+        f"{precision_score(y_test, y_pred_test):.4f}"
+    )
+
+    print(
+        f"recall is "
+        f"{recall_score(y_test, y_pred_test):.4f}"
+    )
+
+    print(
+        f"f1 is "
+        f"{f1_score(y_test, y_pred_test):.4f}"
+    )
+
+    print(
+        f"roc-auc is "
+        f"{roc_auc_score(y_test, y_proba_test):.4f}"
+    )
+
+    print(
+        f"pr-auc is "
+        f"{average_precision_score(y_test, y_proba_test):.4f}"
+    )
+    
+    tn, fp, fn, tp = confusion_matrix(
+        y_test,
+        y_pred_test
+    ).ravel()
+    print(
+        f"Specificity is "
+        f"{tn / (tn + fp):.4f}"
+    )
+
 
     # 9.Deploy the model........
     final_model = HeartModel(

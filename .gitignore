@@ -29,3 +29,5 @@ key.env
 *.onnx
 
 *.pkl
+
+.streamlit/secrets.toml
