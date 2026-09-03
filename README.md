@@ -1,104 +1,272 @@
-Abstract
-This project introduces an intelligent, end‑to‑end clinical decision‑support system designed to estimate the risk of heart disease by integrating classical Machine Learning (ML) models with a Large Language Model (LLM) for interpretability. A predictive model was trained on the widely used UCI Heart Disease Dataset to estimate the probability of cardiovascular disease based on structured clinical features. To enhance user understanding, an LLM is incorporated through an API to generate human‑readable clinical explanations of the model’s predictions. The system is implemented using FastAPI for backend computation and Streamlit for user interaction, allowing efficient data input, real‑time inference, and transparent interpretability.
+# ❤️ Heart Disease Prediction
+*by Arian Khoushabi*
 
-1. Introduction
-Heart disease remains one of the leading causes of mortality worldwide. Early identification of at‑risk individuals plays a critical role in reducing mortality and improving clinical outcomes. Traditional ML models have demonstrated strong predictive capability; however, their interpretability remains limited for non‑technical users.
+A machine learning application for predicting the presence of heart disease using clinical features from the UCI Heart Disease dataset.
 
-To address this gap, this project proposes a hybrid framework that:
+The project uses an **XGBoost classifier** combined with a preprocessing pipeline and a custom decision-threshold selection strategy designed to prioritize **recall**, which is particularly important in a heart disease screening context.
 
-Predicts heart‑disease risk using an ML model trained on clinical attributes.
-Uses a Large Language Model to produce an accessible clinical explanation based on the prediction.
-Provides a fully interactive interface suitable for clinical decision‑support exploration.
-2. Dataset
-The system utilizes the UCI Heart Disease Dataset, one of the most established datasets in cardiovascular risk prediction research.
+## 🚀 Live Demo
 
-Features include:
+Try the deployed Streamlit application:
 
-Age
-Sex
-Chest pain type
-Resting blood pressure
-Serum cholesterol
-Fasting blood sugar
-Resting ECG results
-Maximum heart rate achieved
-Exercise-induced angina
-ST depression (Oldpeak)
-The dataset is preprocessed to ensure data consistency and optimal model performance.
+**[Heart Disease Prediction App](https://qlr4xappf9mppkq5bk8juq7.streamlit.app/)**
 
-3. Methodology
-3.1 Machine Learning Model
-A predictive classification model is developed using Python and Scikit‑Learn. Feature scaling, encoding, and preprocessing are implemented to prepare clinical variables for training.
+---
 
-The ML model outputs a probabilistic estimation of the likelihood of heart disease.
+## 📌 Project Overview
 
-3.2 LLM‑Based Interpretation
-To bridge the interpretability gap, an LLM is integrated using an external API.
+Heart disease is one of the major health challenges worldwide. Machine learning can be used to identify patterns in clinical data and provide predictions that may assist with risk assessment.
 
-Given the ML model’s output, the LLM generates:
+This project develops an end-to-end machine learning pipeline that:
 
-A narrative clinical explanation
-Insight into contributing variables
-A user‑friendly summary of patient risk
-This improves transparency and supports non‑technical stakeholders.
+- Preprocesses categorical and numerical clinical features
+- Uses **XGBoost** for classification
+- Evaluates multiple classification metrics
+- Optimizes the classification threshold with a focus on recall
+- Saves the trained model for deployment
+- Provides an interactive Streamlit web application
 
-3.3 System Architecture
-The system is composed of two main layers:
+> **Important:** This project is an educational machine learning project and is **not a medical diagnostic tool**. The model should not be used for clinical decision-making.
 
-Backend (FastAPI):
+---
 
-Handles data preprocessing, prediction, and communication with the LLM API.
+## 📊 Dataset
 
-Frontend (Streamlit):
+The project uses a combined version of the **UCI Heart Disease dataset**.
 
-Provides a clean interface where users can input patient data, perform predictions, and view explanations.
+The dataset contains clinical attributes commonly used in heart disease prediction, including:
 
-Data flow is real‑time, enabling an interactive and educational user experience.
+- Age
+- Sex
+- Chest pain type
+- Resting blood pressure
+- Cholesterol
+- Fasting blood sugar
+- Resting ECG
+- Maximum heart rate
+- Exercise-induced angina
+- ST depression
+- ST slope
+- Other clinical measurements
 
-4. Implementation
-4.1 Project Structure
+### Target
 
+The target variable is:
+
+`HeartDisease`
+
+where the model predicts whether heart disease is present.
+
+---
+
+## 🧠 Machine Learning Approach
+
+### Preprocessing
+
+The preprocessing pipeline separates categorical and numerical features.
+
+Categorical variables are encoded using:
+
+- `OneHotEncoder`
+
+Numerical features are transformed using:
+
+- `PowerTransformer`
+
+The preprocessing and model are combined into a **scikit-learn Pipeline**, helping ensure that the same transformations are applied consistently during training and prediction.
+
+### Model
+
+The classifier used in this project is:
+
+**XGBoost (`XGBClassifier`)**
+
+XGBoost was selected because of its strong performance on structured/tabular data and its ability to model nonlinear relationships between clinical features.
+
+---
+
+## 🎯 Decision Threshold Optimization
+
+Instead of automatically using the default classification threshold of `0.5`, the project selects a threshold using validation data.
+
+The threshold-selection strategy prioritizes **recall**, because missing a patient with potential heart disease can be more concerning than generating some additional false positives in a screening-oriented setting.
+
+A minimum validation recall requirement of:
+
+**0.85**
+
+was used when selecting the decision threshold.
+
+The selected threshold was approximately:
+
+**0.4074**
+
+### Why recall?
+
+Recall is defined as:
+
+```text
+Recall = TP / (TP + FN)
+
+A higher recall means the model identifies a larger proportion of positive cases.
+
+For a screening-oriented application, reducing false negatives can be particularly important.
+
+📈 Model Performance
+
+The final model achieved the following performance on the test set:
+
+Metric	Score
+Accuracy	85.57%
+Precision	83.43%
+Recall	91.95%
+F1 Score	87.48%
+ROC-AUC	92.03%
+PR-AUC	92.96%
+Specificity	77.82%
+
+The model's relatively high recall reflects the project's emphasis on identifying as many potential positive cases as possible.
+
+🏗️ Project Structure
 Heart/
-│── app.py                # FastAPI backend
-│── main.py               # Streamlit user interface
-│── model_preprocess.py   # Data preprocessing functions
-│── myModel.py            # Model training script
-│── Heart_ai.pkl          # Trained ML model
-│── heart.ipynb           # Notebook for analysis and experiments
-│── UCI_Heart_Disease...  # Dataset file
-│── requirements.txt      # Dependencies
-│── __pycache__/          # Cache files (ignored)
+│
+├── app.py
+├── model_preprocess.py
+├── requirements.txt
+├── README.md
+│
+├── data/
+│   └── UCI_Heart_Disease_Dataset_Combined.csv
+│
+└── model/
+    └── heart_model.pkl
 
-4.2 Running the System
-Install dependencies:
+The exact structure may vary depending on the current version of the repository.
+
+🛠️ Technologies Used
+Python
+Pandas
+NumPy
+Scikit-learn
+XGBoost
+Matplotlib
+Joblib
+Streamlit
+Main libraries
+pandas
+numpy
+scikit-learn
+xgboost
+matplotlib
+joblib
+streamlit
+⚙️ Installation
+
+Clone the repository:
+
+git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+cd Heart
+
+Create a virtual environment:
+
+python -m venv .venv
+
+Activate it on Windows:
+
+.venv\Scripts\activate
+
+Install the dependencies:
 
 pip install -r requirements.txt
-Start FastAPI backend:
+▶️ Run the Application
 
-uvicorn app:app --reload
-Launch Streamlit interface:
+Start the Streamlit application:
 
-streamlit run main.py
+streamlit run app.py
 
-5. Results
-The integrated system demonstrates that combining a predictive ML model with an LLM‑based explanation module can significantly enhance the interpretability of clinical risk assessments.
+The application will open in your browser.
 
-The ML component provides numerical probabilities, while the LLM translates these into a coherent medical narrative. This hybrid approach has potential value for early screening tools and educational clinical applications.
+🔬 Methodology
 
-6. Discussion and Future Work
-Potential future extensions include:
+The general workflow of the project is:
 
-Incorporation of SHAP or LIME for quantitative feature attribution
-Deployment on cloud platforms such as AWS, Azure, or Google Cloud
-Expansion to additional cardiovascular datasets
-Integration of multimodal data (e.g., ECG signals, images)
-Fine‑tuning domain‑specific LLMs for improved medical reasoning
+Raw Dataset
+     ↓
+Data Cleaning
+     ↓
+Train / Validation / Test Split
+     ↓
+Feature Preprocessing
+     ↓
+XGBoost Classifier
+     ↓
+Validation Predictions
+     ↓
+Decision Threshold Selection
+     ↓
+Final Test Evaluation
+     ↓
+Saved Model
+     ↓
+Streamlit Deployment
 
-7. Conclusion
-This project demonstrates an effective fusion of classical machine learning and large language models to provide both prediction accuracy and interpretability in heart‑disease risk estimation. The combination of FastAPI, Streamlit, and LLM‑powered explanations forms a practical and educational tool for early clinical decision support.
+The decision threshold is selected using validation data rather than the test set in order to avoid using test data for model-selection decisions.
 
-8. References
-UCI Machine Learning Repository: Heart Disease Dataset
-Scikit‑Learn Documentation
-FastAPI Documentation
-Streamlit Documentation
+⚠️ Limitations
+
+Although the model demonstrates promising performance, several limitations should be considered.
+
+Dataset limitations
+
+The UCI Heart Disease dataset is a relatively small, structured dataset and does not represent the complexity and diversity of modern clinical datasets.
+
+Real-world healthcare systems may contain:
+
+Electronic Health Records (EHRs)
+ECG signals
+Medical imaging
+Longitudinal patient histories
+Laboratory measurements
+Larger and more diverse patient populations
+
+Therefore, the reported performance should not be interpreted as evidence of clinical effectiveness.
+
+Generalization
+
+The model has been evaluated on a held-out test set from the same dataset distribution. External validation using independent clinical datasets would be necessary before considering real-world clinical applications.
+
+Clinical use
+
+This application is intended for educational and research purposes only and should not replace professional medical assessment.
+
+🔮 Future Improvements
+
+Potential future improvements include:
+
+External validation using independent datasets
+Evaluation on larger clinical datasets
+Hyperparameter optimization
+Calibration of predicted probabilities
+More extensive cross-validation
+Explainable AI techniques such as SHAP
+Feature importance analysis
+Comparison with other machine learning models
+Integration with real-world clinical datasets
+Improved monitoring and model validation for deployment
+📚 References
+UCI Machine Learning Repository — Heart Disease Dataset
+Chen, T. & Guestrin, C. — XGBoost: A Scalable Tree Boosting System
+Scikit-learn documentation
+XGBoost documentation
+Streamlit documentation
+👨‍💻 Author
+
+Arian
+
+This project was developed as a machine learning project focused on applying classification techniques to healthcare-related tabular data.
+
+⭐ Disclaimer
+
+This project is not intended for medical diagnosis, treatment, or clinical decision-making.
+
+Predictions generated by the application should not be considered medical advice. Any health-related decision should be made in consultation with a qualified healthcare professional.

@@ -16,6 +16,7 @@ st.caption(
     "Machine-learning cardiovascular risk classification "
     "with AI-assisted clinical interpretation."
 )
+st.markdown("*Created by Arian Khoushabi*")
 
 @st.cache_resource
 def load_heart_model():
@@ -371,7 +372,7 @@ if submitted:
     st.info(interpretation)
 
     st.warning(
-        "Research prototype: this model has not been clinically "
+        "A note from Arian: this model has not been clinically "
         "validated for diagnosis or treatment decisions. "
         "Its output should not be used as a substitute for "
         "professional clinical assessment."
